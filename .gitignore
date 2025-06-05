@@ -1,0 +1,101 @@
+# ====================================
+# Drupal Composer Project .gitignore
+# ====================================
+
+# Composer
+/vendor/
+/composer.lock
+
+# Drupal core
+/web/core/
+/web/modules/contrib/
+/web/themes/contrib/
+/web/profiles/contrib/
+/web/libraries/
+
+# Archivos de configuración sensibles
+/web/sites/*/settings.php
+/web/sites/*/services.yml
+/web/sites/*/settings.local.php
+
+# Archivos privados de Drupal
+/web/sites/*/files/
+/web/sites/*/private/
+/web/sites/*/translations/
+
+# Config export (si no usas config split aún)
+/config/sync/
+/config/dev/
+/config/prod/
+
+# Temporal y caché de Drupal
+/web/sites/*/files/php/*
+/web/sites/*/files/js/*
+/web/sites/*/files/css/*
+/web/sites/*/files/tmp/*
+/web/sites/*/files/styles/*
+/web/sites/*/files/imagecache/*
+/web/sites/*/files/s3fs-public/*
+/web/sites/*/files/s3fs-private/*
+/web/sites/*/files/.htaccess
+
+# Logs y backups
+/web/sites/*/files/*.log
+/web/sites/*/files/backup_*
+
+# Archivos locales y del entorno
+.env
+.env.local
+.phpunit.result.cache
+/web/sites/simpletest
+
+# Node y frontend si usas tema personalizado
+/node_modules/
+/themes/custom/**/node_modules/
+/themes/custom/**/dist/
+/themes/custom/**/build/
+/themes/custom/**/.cache/
+/themes/custom/**/package-lock.json
+/themes/custom/**/pnpm-lock.yaml
+/themes/custom/**/yarn.lock
+
+# IDEs y editores
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# Archivos temporales o de pruebas
+*.swp
+*.bak
+*.tmp
+*.log
+*.orig
+
+# Tests internos o mocks
+/tests/mocks/
+/tests/tmp/
+/web/tests/
+/web/modules/custom/**/tests/tmp/
+
+# Permitir versionar archivos marcadores de carpetas vacías
+!**/.gitkeep
+
+# Node.js / Frontend build artifacts
+node_modules/
+**/node_modules/     # Ignora node_modules en cualquier subcarpeta
+**/dist/             # Ignora compilados como dist/
+**/build/
+**/.cache/
+
+# Lockfiles de gestores de paquetes
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
