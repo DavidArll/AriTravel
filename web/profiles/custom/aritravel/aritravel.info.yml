@@ -1,0 +1,52 @@
+name: AriTravel
+type: profile
+description: 'An installation profile for a headless travel blog.'
+core_version_requirement: ^10
+distribution:
+  name: AriTravel
+dependencies:
+  - drupal:node
+  - drupal:block
+  - drupal:views
+  - drupal:menu_ui
+  - drupal:user
+  - drupal:path
+  - drupal:token
+  - drupal:field_group
+  - drupal:datetime
+  - drupal:options
+  - drupal:serialization
+  - drupal:jsonapi
+  - drupal:layout_builder
+  - drupal:media
+  - admin_toolbar
+  - pathauto
+  - metatag
+  - twig_tweak
+  - config_split
+  - devel
+  - graphql
+  - paragraphs
+install:
+  - node
+  - block
+  - views
+  - menu_ui
+  - user
+  - path
+  - token
+  - field_group
+  - datetime
+  - options
+  - serialization
+  - jsonapi
+  - layout_builder
+  - media
+  - admin_toolbar
+  - pathauto
+  - metatag
+  - twig_tweak
+  - config_split
+  - devel
+  - graphql
+  - paragraphs
