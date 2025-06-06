@@ -696,6 +696,44 @@ if (!function_exists('_aritravel_grant_permissions')) {
 
   // For now, the above should provide a good baseline.
   // Specific JSON:API permissions might need refinement after testing with simple_oauth and cors.
+
+  // JSON:API settings
+  // The jsonapi module, once enabled, works largely based on entity access and permissions.
+  // The default path is /jsonapi.
+  // We ensure that the module is installed via dependencies.
+  // We've already set up basic access permissions:
+  // - 'access jsonapi resource list' for anonymous and authenticated.
+  // - 'access content' for anonymous and authenticated.
+
+  // No specific programmatic configuration is usually needed here for basic operation
+  // unless we were changing the path prefix or using jsonapi_extras for resource overrides.
+  // For now, we rely on the default behavior and permissions set earlier.
+  // We can, however, ensure the 'read_only' setting if desired, but the default is FALSE (writable).
+  // For a headless CMS, writable is often desired.
+
+  // Example: If we wanted to ensure it's writable (which is default):
+  // \Drupal::configFactory()->getEditable('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+
+  // Log that JSON:API setup is being considered.
+  \Drupal::logger('aritravel')->info('JSON:API module is expected to be enabled via profile dependencies. Permissions for access have been set. Default path /jsonapi will be used.');
+
+  // Set default and admin themes.
+  // Set Claro as the admin theme.
+  \Drupal::configFactory()->getEditable('system.theme')
+    ->set('admin', 'claro')
+    ->save(TRUE);
+
+  // Set ari_headless_theme as the default theme.
+  \Drupal::configFactory()->getEditable('system.theme')
+    ->set('default', 'ari_headless_theme')
+    ->save(TRUE);
+
+  // Ensure the theme is installed. The profile system should handle this if it's
+  // listed as the default theme, but explicit installation can be done too.
+  // \Drupal::service('theme_installer')->install(['ari_headless_theme']);
+  // However, setting it as default usually triggers installation.
+
+  \Drupal::logger('aritravel')->info('Admin theme set to Claro, default theme set to ari_headless_theme.');
   // Core settings will be configured here.
   // Content types, taxonomies, etc., will be created here.
 }

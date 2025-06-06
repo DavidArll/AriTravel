@@ -1,0 +1,9 @@
+app:
+  js:
+    js/app.js: {} # Placeholder for the main JS app file
+  css:
+    theme:
+      css/style.css: {} # Placeholder for minimal CSS
+# Example: If loading from a CDN like Netlify/Vercel, you might not define assets here,
+# but rather load them directly in html.html.twig or via a block.
+# For now, these are placeholders.

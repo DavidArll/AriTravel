@@ -19,6 +19,7 @@ dependencies:
   - drupal:jsonapi
   - drupal:layout_builder
   - drupal:media
+  - drupal:taxonomy
   - admin_toolbar
   - pathauto
   - metatag
@@ -42,6 +43,7 @@ install:
   - jsonapi
   - layout_builder
   - media
+  - taxonomy
   - admin_toolbar
   - pathauto
   - metatag

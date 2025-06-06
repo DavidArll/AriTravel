@@ -1,0 +1,18 @@
+langcode: en
+status: false # Dev split should usually be activated manually or by settings.php
+dependencies: { }
+id: dev
+label: Development
+description: 'Configuration for development environments.'
+weight: 0
+folder: ../config/dev
+module:
+  devel: 0 # 0 means module is present in this split (not blacklisted or graylisted specifically here)
+  # Add other dev-specific modules here if they are not part of core.extension already
+  # For example, if stage_file_proxy is only for dev:
+  # stage_file_proxy: 0
+theme: { }
+blacklist: [ ] # Modules listed here are disabled when this split is active. Not typical for 'dev' split.
+graylist: [ ] # Modules whose config is stored in this split's folder instead of sync.
+graylist_dependents: true
+graylist_skip_equal: true

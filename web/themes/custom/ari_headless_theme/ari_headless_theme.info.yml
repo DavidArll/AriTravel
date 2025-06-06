@@ -1,0 +1,9 @@
+name: Ari Headless Theme
+type: theme
+description: 'A minimal theme for a headless Drupal setup, designed to load a JavaScript application.'
+core_version_requirement: ^10
+base theme: stable9 # Using stable9 for a clean base
+libraries:
+  - ari_headless_theme/app # Placeholder for JS app assets
+regions:
+  content: 'Main content' # Minimal region, might not even be used by JS app

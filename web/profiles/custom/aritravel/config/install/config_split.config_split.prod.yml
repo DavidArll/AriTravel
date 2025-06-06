@@ -1,0 +1,18 @@
+langcode: en
+status: false # Prod split is activated on production, usually via settings.php
+dependencies: { }
+id: prod
+label: Production
+description: 'Configuration for production environments.'
+weight: 1 # Higher weight means it can override dev if both somehow active (not typical)
+folder: ../config/prod
+module: # This section in config_split defines how modules are handled *by this split definition*
+  # It does not enable/disable modules directly here but rather how their config is treated.
+  # To disable 'devel' in prod, it should be blacklisted.
+theme: { }
+blacklist:
+  - devel # devel module will be disabled when 'prod' split is active.
+  # Add any other modules to disable in production (e.g., kint, webprofiler if they were installed)
+graylist: [ ]
+graylist_dependents: true
+graylist_skip_equal: true

@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ * Theme override for the basic structure of a single Drupal page.
+ * This version is minimal, intended for a headless setup where a JS app takes over.
+ */
+#}
+<!DOCTYPE html>
+<html{{ html_attributes }}>
+  <head>
+    <head-placeholder token="{{ placeholder_token|raw }}">
+    <title>{{ head_title|safe_join(' | ') }}</title>
+    <css-placeholder token="{{ placeholder_token|raw }}">
+    <js-placeholder token="{{ placeholder_token|raw }}">
+  </head>
+  <body{{ attributes }}>
+    {# Minimal body, JS app should attach to a div like #app-root #}
+    <div id="app-root" data-drupal-messages>
+      {# Optional: You might place {{ page.content }} here if Drupal needs to render messages or minimal content #}
+      {# For a pure JS app, this might be empty and the JS app handles everything. #}
+    </div>
+    <js-bottom-placeholder token="{{ placeholder_token|raw }}">
+  </body>
+</html>
