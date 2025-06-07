@@ -1,0 +1,8 @@
+uuid: c3d4e5f6-a7b8-9999-aaaabbbbccccdddd
+langcode: en
+status: true
+dependencies: { }
+name: Tags
+vid: tags
+description: 'Standard tags for content.'
+weight: 0

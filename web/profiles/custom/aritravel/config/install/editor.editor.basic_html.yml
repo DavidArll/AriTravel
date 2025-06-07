@@ -1,0 +1,49 @@
+uuid: editor-basic-html-uuid-7002
+langcode: en
+status: true
+dependencies:
+  config:
+    - filter.format.basic_html
+  module:
+    - ckeditor5 # Dependency on CKEditor 5 module
+format: basic_html
+editor: ckeditor5
+settings:
+  toolbar:
+    items:
+      - bold
+      - italic
+      - underline
+      - strikethrough
+      - blockQuote
+      - '|'
+      - link
+      - '|'
+      - bulletedList
+      - numberedList
+      - '|'
+      - heading
+      - '|'
+      - sourceEditing # Optional: allow source editing
+      # - drupalMediaLibrary # Add if you want media library integration in CKEditor
+  plugins:
+    ckeditor5_heading:
+      enabled_headings:
+        - heading2
+        - heading3
+        - heading4
+        - heading5
+        - heading6
+    ckeditor5_sourceEditing: # If sourceEditing is enabled
+      allowed_tags: [] # Empty means allow all, or specify tags
+    # ckeditor5_drupalMediaLibrary: # If drupalMediaLibrary is enabled
+    #   media_types: ['image'] # Restrict to image media type
+image:
+  upload: # Settings for image uploads directly via CKEditor (if not using media library for everything)
+    status: true # Enable direct image uploads if desired, though media library is often preferred
+    directory: '[date:custom:Y-m]' # Or inline-images
+    max_size: '' # Empty for system max
+    max_dimensions:
+      width: 0
+      height: 0
+  toolbar: [ 'imageStyle:alignLeft', 'imageStyle:alignCenter', 'imageStyle:alignRight', '|', 'imageTextAlternative', '|', 'toggleImageCaption' ]

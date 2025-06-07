@@ -1,0 +1,8 @@
+uuid: a1b2c3d4-e5f6-7777-8888-9999aaaabbbb
+langcode: en
+status: true
+dependencies: { }
+name: 'Travel Style'
+vid: travel_style
+description: 'Defines the style of travel (e.g., romantic, adventure).'
+weight: 0

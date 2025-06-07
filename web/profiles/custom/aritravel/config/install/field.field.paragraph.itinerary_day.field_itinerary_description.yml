@@ -1,0 +1,21 @@
+uuid: para-itindesc-field-uuid-5005
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_itinerary_description
+    - paragraphs.paragraphs_type.itinerary_day
+  module:
+    - text
+id: paragraph.itinerary_day.field_itinerary_description
+field_name: field_itinerary_description
+entity_type: paragraph
+bundle: itinerary_day
+label: Description
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

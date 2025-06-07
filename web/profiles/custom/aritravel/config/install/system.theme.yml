@@ -1,0 +1,5 @@
+admin: gin
+default: bartik
+langcode: en
+_core:
+  default_config_hash: placeholder_hash_for_system_theme_yml

@@ -1,0 +1,54 @@
+uuid: testimonial-view-display-uuid-2011
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.testimonial.field_author_image
+    - field.field.node.testimonial.field_author_name
+    - field.field.node.testimonial.field_related_trip_testimonial
+    - field.field.node.testimonial.field_testimonial_body
+    - node.type.testimonial
+  module:
+    - text
+    - user
+id: node.testimonial.default
+targetEntityType: node
+bundle: testimonial
+mode: default
+content:
+  field_author_name:
+    type: string
+    label: above
+    weight: 1
+    region: content
+    settings: { link_to_entity: false }
+    third_party_settings: {  }
+  field_testimonial_body:
+    type: text_default
+    label: above
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_author_image:
+    type: entity_reference_entity_view
+    label: above
+    weight: 3
+    region: content
+    settings: { view_mode: default, link: false }
+    third_party_settings: {  }
+  field_related_trip_testimonial:
+    type: entity_reference_label
+    label: above
+    weight: 4
+    region: content
+    settings: { link: true }
+    third_party_settings: {  }
+links:
+  content:
+    weight: 0
+    region: content
+hidden:
+  title: true
+  created: true
+  uid: true

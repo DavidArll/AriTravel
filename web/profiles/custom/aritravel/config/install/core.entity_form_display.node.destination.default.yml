@@ -1,0 +1,79 @@
+uuid: dest-form-display-uuid-1007
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.destination.field_cover_image
+    - field.field.node.destination.field_destination_country
+    - field.field.node.destination.field_related_trips
+    - field.field.node.destination.field_summary
+    - node.type.destination
+  module:
+    - media_library # For media widget
+    - path # For path alias form
+    - text
+id: node.destination.default
+targetEntityType: node
+bundle: destination
+mode: default
+content:
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_summary:
+    type: text_textarea
+    weight: 1
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_destination_country:
+    type: entity_reference_autocomplete
+    weight: 2
+    region: content
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_cover_image:
+    type: media_library_widget # More user-friendly widget
+    weight: 3
+    region: content
+    settings:
+      media_types:
+        - image
+    third_party_settings: {  }
+  field_related_trips:
+    type: entity_reference_autocomplete
+    weight: 4
+    region: content
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  path: # Path alias form
+    type: path
+    weight: 5
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status: # Published status checkbox
+    type: boolean_checkbox
+    weight: 6
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+hidden:
+  created: true
+  promote: true
+  sticky: true
+  uid: true

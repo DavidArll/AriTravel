@@ -1,0 +1,53 @@
+uuid: filter-basic-html-uuid-7001
+langcode: en
+status: true
+dependencies: { } # CKEditor 5 module will be a dependency if its plugin is used
+name: 'Basic HTML'
+format: basic_html
+weight: -9 # Adjust weight as needed relative to other formats
+filters:
+  filter_html: # HTML filter to restrict tags
+    id: filter_html
+    provider: filter
+    status: true
+    weight: -10
+    settings:
+      allowed_html: '<br> <p> <h1> <h2> <h3> <h4> <h5> <h6> <strong> <em> <u> <s> <blockquote> <a href> <ul> <ol> <li> <img src alt height width data-entity-type data-entity-uuid data-align data-caption>'
+      filter_html_help: true
+      filter_html_nofollow: false
+  filter_align: # Drupal core image alignment filter
+    id: filter_align
+    provider: filter
+    status: true
+    weight: 7
+    settings: {  }
+  filter_caption: # Drupal core image caption filter
+    id: filter_caption
+    provider: filter
+    status: true
+    weight: 8
+    settings: {  }
+  filter_html_image_secure: # Drupal core image secure filter
+    id: filter_html_image_secure
+    provider: filter
+    status: true
+    weight: 9
+    settings: {  }
+  editor_file_reference: # For handling images managed by editor
+    id: editor_file_reference
+    provider: editor
+    status: true
+    weight: 11
+    settings: {  }
+  filter_autop: # Convert line breaks to P and BR tags
+    id: filter_autop
+    provider: filter
+    status: true
+    weight: 0
+    settings: {  }
+  filter_htmlcorrector:
+    id: filter_htmlcorrector
+    provider: filter
+    status: true
+    weight: 10
+    settings: {  }

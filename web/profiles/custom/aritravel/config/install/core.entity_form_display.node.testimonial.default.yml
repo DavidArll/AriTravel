@@ -1,0 +1,66 @@
+uuid: testimonial-form-display-uuid-2010
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.testimonial.field_author_image
+    - field.field.node.testimonial.field_author_name
+    - field.field.node.testimonial.field_related_trip_testimonial
+    - field.field.node.testimonial.field_testimonial_body
+    - node.type.testimonial
+  module:
+    - media_library
+    - path
+    - text
+id: node.testimonial.default
+targetEntityType: node
+bundle: testimonial
+mode: default
+content:
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings: { size: 60, placeholder: '' }
+    third_party_settings: {  }
+  field_author_name:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings: { size: 60, placeholder: '' }
+    third_party_settings: {  }
+  field_testimonial_body:
+    type: text_textarea
+    weight: 2
+    region: content
+    settings: { rows: 5, placeholder: '' }
+    third_party_settings: {  }
+  field_author_image:
+    type: media_library_widget
+    weight: 3
+    region: content
+    settings: { media_types: [image] }
+    third_party_settings: {  }
+  field_related_trip_testimonial:
+    type: entity_reference_autocomplete
+    weight: 4
+    region: content
+    settings: { match_operator: CONTAINS, size: 60, placeholder: '' }
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 5
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 6
+    region: content
+    settings: { display_label: true }
+    third_party_settings: {  }
+hidden:
+  created: true
+  promote: true
+  sticky: true
+  uid: true

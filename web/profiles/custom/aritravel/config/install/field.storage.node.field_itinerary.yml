@@ -1,0 +1,20 @@
+uuid: tripplan-itinerary-storage-uuid-6013
+langcode: en
+status: true
+dependencies:
+  module:
+    - entity_reference_revisions
+    - node
+    - paragraphs
+id: node.field_itinerary
+field_name: field_itinerary
+entity_type: node
+type: entity_reference_revisions
+settings:
+  target_type: paragraph
+module: entity_reference_revisions # Provided by paragraphs module
+locked: false
+cardinality: -1 # Unlimited
+translatable: true # Paragraphs themselves can be translatable
+persist_with_no_fields: false
+custom_storage: false

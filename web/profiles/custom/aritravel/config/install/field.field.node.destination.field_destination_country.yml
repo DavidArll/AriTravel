@@ -1,0 +1,29 @@
+uuid: dest-country-field-uuid-1002
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_destination_country
+    - node.type.destination
+    - taxonomy.vocabulary.country # Dependency on the vocabulary
+id: node.destination.field_destination_country
+field_name: field_destination_country
+entity_type: node
+bundle: destination
+label: Country
+description: ''
+required: false # Adjust as needed
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      country: country
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

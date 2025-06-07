@@ -1,0 +1,55 @@
+uuid: para-itinday-view-display-uuid-5011
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.itinerary_day.field_itinerary_cost
+    - field.field.paragraph.itinerary_day.field_itinerary_day_number
+    - field.field.paragraph.itinerary_day.field_itinerary_description
+    - field.field.paragraph.itinerary_day.field_itinerary_image
+    - paragraphs.paragraphs_type.itinerary_day
+  module:
+    - text
+id: paragraph.itinerary_day.default
+targetEntityType: paragraph
+bundle: itinerary_day
+mode: default
+content:
+  field_itinerary_day_number:
+    type: number_integer # Or string if prefix/suffix used heavily
+    label: inline
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true # To show 'Day X'
+    weight: 0
+    region: content
+    third_party_settings: {  }
+  field_itinerary_description:
+    type: text_default
+    label: hidden # Usually description is primary content
+    settings: {  }
+    weight: 1
+    region: content
+    third_party_settings: {  }
+  field_itinerary_image:
+    type: entity_reference_entity_view # Render media
+    label: hidden
+    settings:
+      view_mode: default # Or a specific thumbnail view mode
+      link: false
+    weight: 2
+    region: content
+    third_party_settings: {  }
+  field_itinerary_cost:
+    type: number_decimal
+    label: inline
+    settings:
+      thousand_separator: ','
+      decimal_separator: '.'
+      scale: 2
+      prefix_suffix: true # To show '$'
+    weight: 3
+    region: content
+    third_party_settings: {  }
+hidden:
+  created: true

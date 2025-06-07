@@ -1,0 +1,14 @@
+uuid: pathauto-contentall-uuid-3001
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: content_all # Machine name for the pattern
+label: 'Content paths (all)'
+type: 'canonical_entities:node'
+pattern: '[node:content-type:name]/[node:title]'
+selection_criteria: { } # Empty, so applies to all node types unless overridden
+selection_logic: and
+weight: -5 # Default weight
+relationships: {  }

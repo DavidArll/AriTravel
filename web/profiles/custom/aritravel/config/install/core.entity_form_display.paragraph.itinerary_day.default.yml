@@ -1,0 +1,51 @@
+uuid: para-itinday-form-display-uuid-5010
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.itinerary_day.field_itinerary_cost
+    - field.field.paragraph.itinerary_day.field_itinerary_day_number
+    - field.field.paragraph.itinerary_day.field_itinerary_description
+    - field.field.paragraph.itinerary_day.field_itinerary_image
+    - paragraphs.paragraphs_type.itinerary_day
+  module:
+    - media_library # For media widget
+    - text
+id: paragraph.itinerary_day.default
+targetEntityType: paragraph
+bundle: itinerary_day
+mode: default
+content:
+  field_itinerary_day_number:
+    type: number # Standard number widget
+    weight: 0
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_itinerary_description:
+    type: text_textarea
+    weight: 1
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_itinerary_image:
+    type: media_library_widget
+    weight: 2
+    region: content
+    settings:
+      media_types:
+        - image
+    third_party_settings: {  }
+  field_itinerary_cost:
+    type: number # Standard number widget for decimal
+    weight: 3
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

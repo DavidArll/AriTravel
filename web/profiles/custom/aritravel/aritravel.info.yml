@@ -2,8 +2,6 @@ name: AriTravel
 type: profile
 description: 'An installation profile for a headless travel blog.'
 core_version_requirement: ^10
-distribution:
-  name: AriTravel
 dependencies:
   - drupal:node
   - drupal:block
@@ -20,14 +18,17 @@ dependencies:
   - drupal:layout_builder
   - drupal:media
   - drupal:taxonomy
+  - drupal:field
   - admin_toolbar
   - pathauto
   - metatag
   - twig_tweak
   - config_split
   - devel
-  - graphql
   - paragraphs
+  - gin
+  - simple_oauth
+
 install:
   - node
   - block
@@ -44,11 +45,13 @@ install:
   - layout_builder
   - media
   - taxonomy
+  - field
   - admin_toolbar
   - pathauto
   - metatag
   - twig_tweak
   - config_split
   - devel
-  - graphql
   - paragraphs
+  - gin
+  - simple_oauth

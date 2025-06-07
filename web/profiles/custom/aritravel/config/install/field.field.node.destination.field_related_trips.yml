@@ -1,0 +1,28 @@
+uuid: dest-reltrips-field-uuid-1006
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_related_trips
+    - node.type.destination
+    - node.type.trip_plan # Dependency on trip_plan content type
+id: node.destination.field_related_trips
+field_name: field_related_trips
+entity_type: node
+bundle: destination
+label: 'Related Trips'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      trip_plan: trip_plan
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -15,33 +15,14 @@ function aritravel_install() {
 
   // Set default site name.
   \Drupal::configFactory()->getEditable('system.site')->set('name', 'AriTravel CMS')->save(TRUE);
-
   // Set default site mail.
   \Drupal::configFactory()->getEditable('system.site')->set('mail', 'admin@aritravel.com')->save(TRUE);
-
   // Set default country.
   \Drupal::configFactory()->getEditable('system.date')->set('country.default', 'MX')->save(TRUE);
-
   // Set default timezone.
-  // Note: Drupal core does not automatically create all timezones.
-  // America/Mexico_City should be available.
   \Drupal::configFactory()->getEditable('system.date')->set('timezone.default', 'America/Mexico_City')->save(TRUE);
 
-  // Enable clean URLs. This is typically handled by web server configuration and
-  // Drupal's detection. The setting itself 'clean_url' is read-only in Drupal 8/9/10
-  // as it's auto-detected. We will ensure the .htaccess is correct.
-  // For now, we will skip explicitly setting clean_url via PHP here as it's not standard.
-  // It's usually enabled by default if the environment supports it.
-
-  // Ensure user module is installed as we are setting admin account details.
-  // This is usually handled by dependencies in .info.yml but good to be aware.
-  // The profile installation process should handle this.
-
-  // Set admin user details (user 1).
-  // This is often done in install_configure_form_submit or here.
-  // For a headless install, we might want to pre-create a specific admin user.
-  // However, the standard install process creates user 1.
-  // Let's ensure the admin email is also set for user 1.
+  // User 1 email
   $user_storage = \Drupal::entityTypeManager()->getStorage('user');
   $user1 = $user_storage->load(1);
   if ($user1) {
@@ -49,693 +30,96 @@ function aritravel_install() {
     $user1->save();
   }
 
-  // Create taxonomy vocabularies.
-  $vocabularies = [
-    [
-      'vid' => 'travel_style',
-      'name' => 'Travel Style',
-      'description' => 'Defines the style of travel (e.g., romantic, adventure).',
-    ],
-    [
-      'vid' => 'country',
-      'name' => 'Country',
-      'description' => 'List of countries for destinations and trip plans.',
-    ],
-    [
-      'vid' => 'tags',
-      'name' => 'Tags',
-      'description' => 'Standard tags for content.',
-    ],
-  ];
-
-  foreach ($vocabularies as $voc_config) {
-    $vocabulary = \Drupal::entityTypeManager()
-      ->getStorage('taxonomy_vocabulary')
-      ->create($voc_config);
-    $vocabulary->save();
+  // Ensure essential modules for programmatic additions are enabled
+  // (though info.yml should handle this, belt-and-suspenders for .install execution order)
+  $module_installer = \Drupal::service('module_installer');
+  if ($module_installer) {
+    $module_installer->install(['taxonomy'], TRUE); // Ensure taxonomy is definitely on for term creation
   }
 
-  // Add some default terms to 'Travel Style'
-  $travel_style_terms = ['Romantic', 'Adventure', 'Solo', 'Family'];
+  // Create default terms for 'Travel Style' vocabulary.
+  // Assumes 'travel_style' vocabulary is created from config/install YAML.
+  \Drupal::logger('aritravel')->info('Attempting to create default terms for Travel Style.');
+  $travel_style_terms = ['romantic', 'adventure', 'solo', 'family', 'luxury'];
   foreach ($travel_style_terms as $term_name) {
-    \Drupal::entityTypeManager()->getStorage('taxonomy_term')->create([
-      'name' => $term_name,
-      'vid' => 'travel_style',
-    ])->save();
-  }
-
-  // Note: Populating the 'Country' vocabulary with a full list of countries
-  // can be extensive. For now, it will be created empty.
-  // It can be populated manually later or via a migration/another script if needed.
-
-  // Create content type: trip_plan
-  $node_type = \Drupal::entityTypeManager()->getStorage('node_type')->create([
-    'type' => 'trip_plan',
-    'name' => 'Trip Plan',
-    'description' => 'Content type for detailed travel itineraries and plans.',
-    'new_revision' => TRUE,
-    'display_submitted' => FALSE, // Hide author and date info by default
-  ]);
-  $node_type->save();
-
-  // Add Body field (long text with summary) - usually present, but ensure settings.
-  // Drupal standard installation profile often adds a body field to new content types.
-  // We can customize it or ensure it's there.
-  // For now, assume it's created by default or add it if a helper function exists.
-  // Let's ensure it's explicitly configured if possible.
-  // node_add_body_field($node_type, 'Body');
-
-
-  // Field definitions:
-  $fields = [];
-
-  // Duration (integer, days)
-  $fields['field_duration'] = [
-    'field_name' => 'field_duration',
-    'type' => 'integer',
-    'label' => 'Duration',
-    'settings' => ['unsigned' => TRUE, 'size' => 'normal'],
-    'cardinality' => 1,
-  ];
-
-  // Budget (decimal or price field)
-  // Using 'decimal' type. For 'price', a contrib module like Commerce Price might be needed.
-  $fields['field_budget'] = [
-    'field_name' => 'field_budget',
-    'type' => 'decimal',
-    'label' => 'Budget',
-    'settings' => ['precision' => 10, 'scale' => 2], // Example: 12345678.90
-    'cardinality' => 1,
-  ];
-
-  // Travel Style (taxonomy reference to 'travel_style')
-  $fields['field_travel_style'] = [
-    'field_name' => 'field_travel_style',
-    'type' => 'entity_reference',
-    'label' => 'Travel Style',
-    'settings' => [
-      'target_type' => 'taxonomy_term',
-      'handler_settings' => ['target_bundles' => ['travel_style' => 'travel_style']],
-    ],
-    'cardinality' => 1, // Or -1 for multiple
-  ];
-
-  // Country (taxonomy reference to 'country')
-  $fields['field_country'] = [
-    'field_name' => 'field_country',
-    'type' => 'entity_reference',
-    'label' => 'Country',
-    'settings' => [
-      'target_type' => 'taxonomy_term',
-      'handler_settings' => ['target_bundles' => ['country' => 'country']],
-    ],
-    'cardinality' => 1, // Or -1 for multiple if a trip can span multiple primary countries
-  ];
-
-  // Cities visited (text, multiple)
-  $fields['field_cities_visited'] = [
-    'field_name' => 'field_cities_visited',
-    'type' => 'string', // Plain text
-    'label' => 'Cities Visited',
-    'settings' => ['max_length' => 255],
-    'cardinality' => -1, // Unlimited
-  ];
-
-  // Tags (standard taxonomy tags - entity reference to 'tags')
-  $fields['field_tags'] = [
-    'field_name' => 'field_tags', // Consider using 'field_trip_tags' to avoid conflict if 'tags' is generic
-    'type' => 'entity_reference',
-    'label' => 'Tags',
-    'settings' => [
-      'target_type' => 'taxonomy_term',
-      'handler_settings' => ['target_bundles' => ['tags' => 'tags']],
-    ],
-    'cardinality' => -1, // Unlimited
-  ];
-
-  // Itinerary (paragraphs field)
-  // First, ensure the Paragraph type 'itinerary_day' exists.
-  $paragraph_type_itinerary = \Drupal::entityTypeManager()
-    ->getStorage('paragraphs_type')
-    ->create([
-      'id' => 'itinerary_day',
-      'label' => 'Itinerary Day',
-      'behavior_plugins' => [],
+    // Check if term already exists (e.g., if install hook runs multiple times or from config)
+    $existing_terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
+        'name' => ucfirst($term_name), // Query by capitalized name
+        'vid' => 'travel_style',
     ]);
-  $paragraph_type_itinerary->save();
-
-  // Add fields to the 'itinerary_day' paragraph type:
-  // Day (text or number), Description (long text), Image (media), Cost (decimal)
-  $paragraph_fields = [];
-  $paragraph_fields['field_itinerary_day_number'] = [
-    'field_name' => 'field_itinerary_day_number',
-    'type' => 'integer', // Or string if 'Day 1', 'Day 2' is preferred
-    'label' => 'Day',
-    'cardinality' => 1,
-  ];
-  $paragraph_fields['field_itinerary_description'] = [
-    'field_name' => 'field_itinerary_description',
-    'type' => 'text_long',
-    'label' => 'Description',
-    'cardinality' => 1,
-  ];
-  $paragraph_fields['field_itinerary_image'] = [
-    'field_name' => 'field_itinerary_image',
-    'type' => 'entity_reference',
-    'label' => 'Image',
-    'settings' => ['target_type' => 'media', 'handler_settings' => ['target_bundles' => ['image' => 'image']]], // Assuming 'image' media type
-    'cardinality' => 1,
-  ];
-  $paragraph_fields['field_itinerary_cost'] = [
-    'field_name' => 'field_itinerary_cost',
-    'type' => 'decimal',
-    'label' => 'Cost',
-    'settings' => ['precision' => 10, 'scale' => 2],
-    'cardinality' => 1,
-  ];
-
-  foreach ($paragraph_fields as $info) {
-    $field_storage = \Drupal::entityTypeManager()->getStorage('field_storage_config')->create([
-      'field_name' => $info['field_name'],
-      'entity_type' => 'paragraph',
-      'type' => $info['type'],
-      'settings' => $info['settings'] ?? [],
-      'cardinality' => $info['cardinality'],
-    ]);
-    $field_storage->save();
-
-    \Drupal::entityTypeManager()->getStorage('field_config')->create([
-      'field_storage' => $field_storage,
-      'bundle' => 'itinerary_day', // Paragraph bundle
-      'label' => $info['label'],
-      'required' => $info['required'] ?? FALSE,
-    ])->save();
+    if (empty($existing_terms)) {
+        \Drupal::entityTypeManager()->getStorage('taxonomy_term')->create([
+            'name' => ucfirst($term_name), // Capitalize first letter
+            'vid' => 'travel_style',
+        ])->save();
+        \Drupal::logger('aritravel')->info('Created Travel Style term: @term', ['@term' => ucfirst($term_name)]);
+    } else {
+        \Drupal::logger('aritravel')->info('Travel Style term already exists: @term', ['@term' => ucfirst($term_name)]);
+    }
   }
+  \Drupal::logger('aritravel')->info('Finished creating default terms for Travel Style.');
 
-  // Now, add the 'Itinerary' field to 'trip_plan' content type
-  $fields['field_itinerary'] = [
-    'field_name' => 'field_itinerary',
-    'type' => 'entity_reference_revisions', // Paragraphs field type
-    'label' => 'Itinerary',
-    'settings' => [
-      'target_type' => 'paragraph',
-      'handler_settings' => [
-        'target_bundles' => ['itinerary_day' => 'itinerary_day'],
-        'negate' => 0,
-        'target_bundles_drag_drop' => [
-          'itinerary_day' => ['enabled' => TRUE, 'weight' => 0],
-        ],
-      ],
-    ],
-    'cardinality' => -1, // Unlimited
-  ];
-
-
-  // Gallery (media reference, unlimited)
-  // Assuming a media type 'image' exists and is desired for the gallery.
-  // If other types, or a generic 'file' media type, adjust 'target_bundles'.
-  $fields['field_gallery'] = [
-    'field_name' => 'field_gallery',
-    'type' => 'entity_reference',
-    'label' => 'Gallery',
-    'settings' => [
-      'target_type' => 'media',
-      'handler_settings' => ['target_bundles' => ['image' => 'image']], // Adjust if other media types are needed
-    ],
-    'cardinality' => -1, // Unlimited
-  ];
-
-
-  // Loop through fields and add them to the 'trip_plan' content type
-  foreach ($fields as $info) {
-    $field_storage = \Drupal::entityTypeManager()->getStorage('field_storage_config')->create([
-      'field_name' => $info['field_name'],
-      'entity_type' => 'node',
-      'type' => $info['type'],
-      'settings' => $info['settings'] ?? [],
-      'cardinality' => $info['cardinality'],
-    ]);
-    $field_storage->save();
-
-    \Drupal::entityTypeManager()->getStorage('field_config')->create([
-      'field_storage' => $field_storage,
-      'bundle' => 'trip_plan', // Content type machine name
-      'label' => $info['label'],
-      'required' => $info['required'] ?? FALSE,
-      // Add 'description' or 'help text' if needed
-      // Add 'default_value_callback' or 'default_value' if needed
-    ])->save();
-
-    // Configure field display on default form and view displays (optional, but good for usability)
-    // Example for form display:
-    $form_display = \Drupal::entityTypeManager()
-      ->getStorage('entity_form_display')
-      ->load('node.trip_plan.default');
-    if (!$form_display) {
-        $form_display = \Drupal::entityTypeManager()
-            ->getStorage('entity_form_display')
-            ->create([
-                'targetEntityType' => 'node',
-                'bundle' => 'trip_plan',
-                'mode' => 'default',
-                'status' => TRUE,
-            ]);
-    }
-    $form_display->setComponent($info['field_name'], [
-        'type' => aritravel_get_default_widget_type($info['type']), // Helper to get a default widget
-        // 'weight' => ..., // Set field order if needed
-    ])->save();
-
-
-    // Example for view display (default view mode):
-     $view_display = \Drupal::entityTypeManager()
-      ->getStorage('entity_view_display')
-      ->load('node.trip_plan.default');
-    if (!$view_display) {
-        $view_display = \Drupal::entityTypeManager()
-            ->getStorage('entity_view_display')
-            ->create([
-                'targetEntityType' => 'node',
-                'bundle' => 'trip_plan',
-                'mode' => 'default',
-                'status' => TRUE,
-            ]);
-    }
-    $view_display->setComponent($info['field_name'], [
-        'label' => 'above', // Or 'inline', 'hidden'
-        'type' => aritravel_get_default_formatter_type($info['type']), // Helper to get a default formatter
-        // 'weight' => ..., // Set field order if needed
-    ])->save();
-  }
-
-  // Create content type: destination
-  $node_type_destination = \Drupal::entityTypeManager()->getStorage('node_type')->create([
-    'type' => 'destination',
-    'name' => 'Destination',
-    'description' => 'Describes a travel destination, like a city or region.',
-    'new_revision' => TRUE,
-    'display_submitted' => FALSE,
-  ]);
-  $node_type_destination->save();
-
-  // Field definitions for destination:
-  $destination_fields = [];
-
-  // Summary (text - using text_long for more flexibility than plain string)
-  $destination_fields['field_summary'] = [
-    'field_name' => 'field_summary',
-    'type' => 'text_long', // Allows for longer text than a simple string, no summary option here.
-    'label' => 'Summary',
-    'cardinality' => 1,
-  ];
-
-  // Country (taxonomy reference to 'country')
-  $destination_fields['field_destination_country'] = [ // Prefixed to avoid conflict if 'field_country' is too generic
-    'field_name' => 'field_destination_country',
-    'type' => 'entity_reference',
-    'label' => 'Country',
-    'settings' => [
-      'target_type' => 'taxonomy_term',
-      'handler_settings' => ['target_bundles' => ['country' => 'country']],
-    ],
-    'cardinality' => 1, // Typically a destination is in one country
-  ];
-
-  // Cover Image (media reference)
-  $destination_fields['field_cover_image'] = [
-    'field_name' => 'field_cover_image',
-    'type' => 'entity_reference',
-    'label' => 'Cover Image',
-    'settings' => [
-      'target_type' => 'media',
-      'handler_settings' => ['target_bundles' => ['image' => 'image']], // Assuming 'image' media type
-    ],
-    'cardinality' => 1,
-  ];
-
-  // Related Trips (entity reference to trip_plan)
-  $destination_fields['field_related_trips'] = [
-    'field_name' => 'field_related_trips',
-    'type' => 'entity_reference',
-    'label' => 'Related Trips',
-    'settings' => [
-      'target_type' => 'node',
-      'handler_settings' => ['target_bundles' => ['trip_plan' => 'trip_plan']],
-    ],
-    'cardinality' => -1, // Unlimited
-  ];
-
-  // Loop through fields and add them to the 'destination' content type
-  foreach ($destination_fields as $info) {
-    $field_storage = \Drupal::entityTypeManager()->getStorage('field_storage_config')->create([
-      'field_name' => $info['field_name'],
-      'entity_type' => 'node',
-      'type' => $info['type'],
-      'settings' => $info['settings'] ?? [],
-      'cardinality' => $info['cardinality'],
-    ]);
-    $field_storage->save();
-
-    \Drupal::entityTypeManager()->getStorage('field_config')->create([
-      'field_storage' => $field_storage,
-      'bundle' => 'destination', // Content type machine name
-      'label' => $info['label'],
-      'required' => $info['required'] ?? FALSE,
-    ])->save();
-
-    // Configure field display on default form and view displays
-    $form_display_dest = \Drupal::entityTypeManager()
-      ->getStorage('entity_form_display')
-      ->load('node.destination.default');
-    if (!$form_display_dest) {
-        $form_display_dest = \Drupal::entityTypeManager()
-            ->getStorage('entity_form_display')
-            ->create([
-                'targetEntityType' => 'node',
-                'bundle' => 'destination',
-                'mode' => 'default',
-                'status' => TRUE,
-            ]);
-    }
-    $form_display_dest->setComponent($info['field_name'], [
-      'type' => aritravel_get_default_widget_type($info['type']), // Using the global helper
-    ])->save();
-
-    $view_display_dest = \Drupal::entityTypeManager()
-      ->getStorage('entity_view_display')
-      ->load('node.destination.default');
-    if (!$view_display_dest) {
-        $view_display_dest = \Drupal::entityTypeManager()
-            ->getStorage('entity_view_display')
-            ->create([
-                'targetEntityType' => 'node',
-                'bundle' => 'destination',
-                'mode' => 'default',
-                'status' => TRUE,
-            ]);
-    }
-    $view_display_dest->setComponent($info['field_name'], [
-      'label' => 'above',
-      'type' => aritravel_get_default_formatter_type($info['type']), // Using the global helper
-    ])->save();
-  }
-
-  // Create content type: testimonial
-  $node_type_testimonial = \Drupal::entityTypeManager()->getStorage('node_type')->create([
-    'type' => 'testimonial',
-    'name' => 'Testimonial',
-    'description' => 'User testimonials or reviews for trips.',
-    'new_revision' => TRUE,
-    'display_submitted' => FALSE, // Often, author name is a field, not Drupal's authoring info
-  ]);
-  $node_type_testimonial->save();
-
-  // Field definitions for testimonial:
-  $testimonial_fields = [];
-
-  // Author Name (text)
-  $testimonial_fields['field_author_name'] = [
-    'field_name' => 'field_author_name',
-    'type' => 'string', // Simple text field
-    'label' => 'Author Name',
-    'settings' => ['max_length' => 255],
-    'cardinality' => 1,
-    'required' => TRUE,
-  ];
-
-  // Body (long text) - Reusing 'text_long' type directly.
-  // Drupal's default 'body' field is 'text_with_summary'.
-  // If a simple long text is needed without summary, 'text_long' is fine.
-  // Or, use node_add_body_field() if that specific setup is preferred.
-  // Let's add it explicitly as 'field_testimonial_body' for clarity.
-  $testimonial_fields['field_testimonial_body'] = [
-    'field_name' => 'field_testimonial_body',
-    'type' => 'text_long',
-    'label' => 'Body',
-    'cardinality' => 1,
-    'required' => TRUE,
-  ];
-
-  // Image (media reference)
-  $testimonial_fields['field_author_image'] = [ // Named to distinguish from other images, e.g. trip gallery
-    'field_name' => 'field_author_image',
-    'type' => 'entity_reference',
-    'label' => 'Author Image',
-    'settings' => [
-      'target_type' => 'media',
-      'handler_settings' => ['target_bundles' => ['image' => 'image']], // Assuming 'image' media type
-    ],
-    'cardinality' => 1,
-  ];
-
-  // Related Trip (entity reference to trip_plan)
-  $testimonial_fields['field_related_trip_testimonial'] = [ // More specific name
-    'field_name' => 'field_related_trip_testimonial',
-    'type' => 'entity_reference',
-    'label' => 'Related Trip',
-    'settings' => [
-      'target_type' => 'node',
-      'handler_settings' => ['target_bundles' => ['trip_plan' => 'trip_plan']],
-    ],
-    'cardinality' => 1, // Assuming a testimonial is for one specific trip
-  ];
-
-  // Loop through fields and add them to the 'testimonial' content type
-  foreach ($testimonial_fields as $info) {
-    $field_storage = \Drupal::entityTypeManager()->getStorage('field_storage_config')->create([
-      'field_name' => $info['field_name'],
-      'entity_type' => 'node',
-      'type' => $info['type'],
-      'settings' => $info['settings'] ?? [],
-      'cardinality' => $info['cardinality'],
-    ]);
-    $field_storage->save();
-
-    \Drupal::entityTypeManager()->getStorage('field_config')->create([
-      'field_storage' => $field_storage,
-      'bundle' => 'testimonial', // Content type machine name
-      'label' => $info['label'],
-      'required' => $info['required'] ?? FALSE,
-    ])->save();
-
-    // Configure field display on default form and view displays
-    $form_display_testi = \Drupal::entityTypeManager()
-      ->getStorage('entity_form_display')
-      ->load('node.testimonial.default');
-    if (!$form_display_testi) {
-        $form_display_testi = \Drupal::entityTypeManager()
-            ->getStorage('entity_form_display')
-            ->create([
-                'targetEntityType' => 'node',
-                'bundle' => 'testimonial',
-                'mode' => 'default',
-                'status' => TRUE,
-            ]);
-    }
-    $form_display_testi->setComponent($info['field_name'], [
-      'type' => aritravel_get_default_widget_type($info['type']), // Using the global helper
-    ])->save();
-
-    $view_display_testi = \Drupal::entityTypeManager()
-      ->getStorage('entity_view_display')
-      ->load('node.testimonial.default');
-    if (!$view_display_testi) {
-        $view_display_testi = \Drupal::entityTypeManager()
-            ->getStorage('entity_view_display')
-            ->create([
-                'targetEntityType' => 'node',
-                'bundle' => 'testimonial',
-                'mode' => 'default',
-                'status' => TRUE,
-            ]);
-    }
-    $view_display_testi->setComponent($info['field_name'], [
-      'label' => 'above',
-      'type' => aritravel_get_default_formatter_type($info['type']), // Using the global helper
-    ])->save();
-  }
-
+  // Roles and Permissions code
 if (!function_exists('_aritravel_grant_permissions')) {
   function _aritravel_grant_permissions($role_id, array $permissions) {
-    $config_factory = \Drupal::configFactory();
-    // Ensure the role exists before trying to load it.
-    // For 'authenticated' and 'anonymous', they always exist.
-    // For 'editor', we created it above.
-    // For 'administrator', it also always exists.
     $role = \Drupal::entityTypeManager()->getStorage('user_role')->load($role_id);
     if (!$role) {
-      // Try to load from config if it's a built-in role not yet saved as an entity object in this request
-      $role_config = $config_factory->getEditable('user.role.' . $role_id);
-      if ($role_config->isNew()) {
-        // Role does not exist, cannot grant permissions.
          \Drupal::logger('aritravel')->warning('Role @role_id not found, cannot grant permissions.', ['@role_id' => $role_id]);
         return;
-      }
-      // For existing roles like anonymous/authenticated, permissions are added directly to their config object.
-      // However, user_role_grant_permissions() is the API function.
-      // The entity API approach is cleaner if the role entity can be loaded.
     }
-
-    // Using the user_role_grant_permissions() function is safer as it handles saving.
     user_role_grant_permissions($role_id, $permissions);
-
-    // Log what happened for debugging during install
-    // \Drupal::logger('aritravel')->info('Granted permissions to @role: @perms', ['@role' => $role_id, '@perms' => implode(', ', $permissions)]);
   }
 }
-
-  // Create Editor Role
-  $editor_role = \Drupal::entityTypeManager()->getStorage('user_role')->create([
-    'id' => 'editor',
-    'label' => 'Editor',
-  ]);
+  $editor_role = \Drupal::entityTypeManager()->getStorage('user_role')->create(['id' => 'editor','label' => 'Editor',]);
   $editor_role->save();
-
-  // Define permissions. Note: Permissions are numerous. This will be a selection.
-  // Helper function to grant permissions is defined above
-
-  // Administrator permissions (ensure all, though 'administer site configuration' usually covers most)
-  // Drupal's install process gives user 1 the Administrator role, which has special status.
-  // We can ensure specific key permissions or rely on the default 'administer site configuration'.
-  // For full permissions, typically no specific grants are needed post-install for the 'administrator' role ID if it's the true admin role.
-  // However, if we want to be explicit or if there's a custom admin role:
-  // _aritravel_grant_permissions('administrator', ['access administration pages', 'administer site configuration', ...]);
-
-  // Editor permissions
   $editor_permissions = [
-    // Node access for trip_plan
-    'create trip_plan content',
-    'edit own trip_plan content',
-    'edit any trip_plan content',
-    'delete own trip_plan content',
-    'delete any trip_plan content',
-    'revert trip_plan revisions',
-    'view trip_plan revisions',
-    // Node access for destination
-    'create destination content',
-    'edit own destination content',
-    'edit any destination content',
-    'delete own destination content',
-    'delete any destination content',
-    'revert destination revisions',
-    'view destination revisions',
-    // Node access for testimonial
-    'create testimonial content',
-    'edit own testimonial content',
-    'edit any testimonial content',
-    'delete own testimonial content',
-    'delete any testimonial content',
-    'revert testimonial revisions',
-    'view testimonial revisions',
-    // Other general content editing permissions
-    'access content overview', // For /admin/content
-    'administer nodes', // Potentially too broad, but often given to editors. Review.
-    'access administration pages', // To access admin UI
-    'use text format basic_html', // Or other relevant text formats
-    'access contextual links',
-    'access files overview',
-    'administer menu_ui', // If they need to manage menus related to content
-    'create url aliases', // For pathauto
-    'administer pathauto', // If they need to manage patterns
-    'administer taxonomy', // To manage terms in Country, Travel Style, Tags
-    'edit terms in country',
-    'edit terms in travel_style',
-    'edit terms in tags',
-    'delete terms in country',
-    'delete terms in travel_style',
-    'delete terms in tags',
-    'access media overview', // For media library
-    'create media',
-    'edit any media', // Or 'edit own media'
-    'delete any media', // Or 'delete own media'
-    // Add specific media type permissions if granular control is needed e.g. 'create image media'
+    'create trip_plan content','edit own trip_plan content','edit any trip_plan content','delete own trip_plan content','delete any trip_plan content','revert trip_plan revisions','view trip_plan revisions',
+    'create destination content','edit own destination content','edit any destination content','delete own destination content','delete any destination content','revert destination revisions','view destination revisions',
+    'create testimonial content','edit own testimonial content','edit any testimonial content','delete own testimonial content','delete any testimonial content','revert testimonial revisions','view testimonial revisions',
+    'access content overview','administer nodes','access administration pages','use text format basic_html','access contextual links','access files overview','administer menu_ui','create url aliases','administer pathauto',
+    'administer taxonomy','edit terms in country','edit terms in travel_style','edit terms in tags','delete terms in country','delete terms in travel_style','delete terms in tags',
+    'access media overview','create media','edit any media','delete any media',
   ];
   _aritravel_grant_permissions('editor', $editor_permissions);
-
-  // Authenticated User permissions
-  $authenticated_permissions = [
-    'access content', // Basic permission to view content
-    'access user profiles',
-    'use text format basic_html', // If they can post comments or other content
-    // JSON:API related permissions - very important
-    // Grant access to view all resources (nodes, taxonomy, etc.) that should be public or user-specific
-    // The specific permission is 'access jsonapi resource list'.
-    // More granular: 'view resource type ENTITY_TYPE_ID--BUNDLE_ID' if jsonapi_extras or similar is used for fine-grained control.
-    // For now, let's grant general access to exposed entities.
-    // Default jsonapi behavior is to respect entity access. So 'access content' is key.
-    // For simple_oauth, they'd need to be able to request tokens if applicable to their workflow.
-    'access jsonapi resource list', // Allows to see what resources are available
-    // The following are more specific and depend on how JSON:API is configured (e.g. with jsonapi_extras)
-    // For now, we assume entity access + 'access content' covers viewing.
-    // If simple_oauth is used by authenticated users to get enhanced access, they need:
-    // 'request simple_oauth tokens' (this permission might not exist, check simple_oauth docs)
-    // Let's assume for now 'access content' and entity access controls what they see via JSON:API.
-  ];
+  $authenticated_permissions = ['access content','access user profiles','use text format basic_html','access jsonapi resource list',];
   _aritravel_grant_permissions('authenticated', $authenticated_permissions);
-
-
-  // Anonymous User permissions
-  $anonymous_permissions = [
-    'access content', // Basic permission to view public content
-    // JSON:API related permissions for public content
-    'access jsonapi resource list',
-    // Again, actual content visibility depends on entity access for anonymous users.
-    // Ensure anonymous can view published trip_plan, destination, testimonial nodes.
-    // This is usually controlled at the node type level or via other access modules.
-    // The 'access content' permission is a baseline.
-  ];
+  $anonymous_permissions = ['access content','access jsonapi resource list',];
   _aritravel_grant_permissions('anonymous', $anonymous_permissions);
 
-  // Grant content type specific view permissions to anonymous and authenticated
-  // This is crucial for JSON:API access to actually return data.
-  // These are typically implied by 'access content' but can be made explicit.
-  // The actual permissions are like 'view published trip_plan content'.
-  // Drupal core node access system usually grants these if 'access content' is given.
-  // We should verify this during testing. If nodes are not showing up for anon/auth over JSON:API,
-  // then specific 'view published [content_type] content' permissions might be missing or node access records.
-
-  // For now, the above should provide a good baseline.
-  // Specific JSON:API permissions might need refinement after testing with simple_oauth and cors.
-
-  // JSON:API settings
-  // The jsonapi module, once enabled, works largely based on entity access and permissions.
-  // The default path is /jsonapi.
-  // We ensure that the module is installed via dependencies.
-  // We've already set up basic access permissions:
-  // - 'access jsonapi resource list' for anonymous and authenticated.
-  // - 'access content' for anonymous and authenticated.
-
-  // No specific programmatic configuration is usually needed here for basic operation
-  // unless we were changing the path prefix or using jsonapi_extras for resource overrides.
-  // For now, we rely on the default behavior and permissions set earlier.
-  // We can, however, ensure the 'read_only' setting if desired, but the default is FALSE (writable).
-  // For a headless CMS, writable is often desired.
-
-  // Example: If we wanted to ensure it's writable (which is default):
-  // \Drupal::configFactory()->getEditable('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
-
-  // Log that JSON:API setup is being considered.
+  // JSON:API Logging
   \Drupal::logger('aritravel')->info('JSON:API module is expected to be enabled via profile dependencies. Permissions for access have been set. Default path /jsonapi will be used.');
 
-  // Set default and admin themes.
-  // Set Claro as the admin theme.
-  \Drupal::configFactory()->getEditable('system.theme')
-    ->set('admin', 'claro')
-    ->save(TRUE);
-
-  // Set ari_headless_theme as the default theme.
-  \Drupal::configFactory()->getEditable('system.theme')
-    ->set('default', 'ari_headless_theme')
-    ->save(TRUE);
-
-  // Ensure the theme is installed. The profile system should handle this if it's
-  // listed as the default theme, but explicit installation can be done too.
-  // \Drupal::service('theme_installer')->install(['ari_headless_theme']);
-  // However, setting it as default usually triggers installation.
-
-  \Drupal::logger('aritravel')->info('Admin theme set to Claro, default theme set to ari_headless_theme.');
-  // Core settings will be configured here.
-  // Content types, taxonomies, etc., will be created here.
+  // OAuth Consumer Creation
+  if (\Drupal::moduleHandler()->moduleExists('simple_oauth')) {
+    \Drupal::logger('aritravel')->info('simple_oauth module exists. Attempting to create consumer.');
+    $consumer_storage = \Drupal::entityTypeManager()->getStorage('consumer');
+    // Check if consumer already exists
+    $existing_consumers = $consumer_storage->loadByProperties(['client_id' => 'ari_frontend']);
+    if (empty($existing_consumers)) {
+        // Ensure User 1 exists for the user_id field.
+        $user1_for_consumer = $user_storage->load(1); // Use $user_storage from earlier
+        if ($user1_for_consumer) {
+            $consumer = $consumer_storage->create([
+                'client_id' => 'ari_frontend',
+                'label' => 'Ari Frontend',
+                'secret' => 'AriSecretKey123456',
+                'grant_types' => ['password', 'client_credentials', 'authorization_code', 'refresh_token'],
+                'scopes' => ['basic', 'content'],
+                'is_confidential' => TRUE,
+                'user_id' => $user1_for_consumer->id(),
+                'redirect_uri' => '',
+            ]);
+            $consumer->save();
+            \Drupal::logger('aritravel')->info('OAuth consumer "ari_frontend" created.');
+        } else {
+            \Drupal::logger('aritravel')->error('Cannot create OAuth consumer: User 1 not found.');
+        }
+    } else {
+        \Drupal::logger('aritravel')->info('OAuth consumer "ari_frontend" already exists.');
+    }
+  } else {
+    \Drupal::logger('aritravel')->warning('simple_oauth module not enabled. Skipping consumer creation.');
+  }
 }
 
 // Helper function to suggest default widgets (simplified)

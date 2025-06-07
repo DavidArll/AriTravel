@@ -1,0 +1,27 @@
+uuid: tripplan-tags-field-uuid-6018
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_tags # Use the generic 'field_tags' storage
+    - node.type.trip_plan
+    - taxonomy.vocabulary.tags # Dependency
+id: node.trip_plan.field_tags
+field_name: field_tags # This will share storage if other content types use 'field_tags'
+entity_type: node
+bundle: trip_plan
+label: Tags
+description: ''
+required: false
+translatable: false # Tags usually are not language specific on the reference
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      tags: tags
+    sort: { field: name, direction: asc }
+    auto_create: true # Allow creating new tags on the fly
+    auto_create_bundle: tags
+field_type: entity_reference

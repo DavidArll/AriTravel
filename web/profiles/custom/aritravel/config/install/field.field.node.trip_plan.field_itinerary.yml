@@ -1,0 +1,31 @@
+uuid: tripplan-itinerary-field-uuid-6014
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_itinerary
+    - node.type.trip_plan
+    - paragraphs.paragraphs_type.itinerary_day # Dependency
+  module:
+    - entity_reference_revisions
+id: node.trip_plan.field_itinerary
+field_name: field_itinerary
+entity_type: node
+bundle: trip_plan
+label: Itinerary
+description: 'Day-by-day plan for the trip.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      itinerary_day: itinerary_day
+    negate: 0
+    target_bundles_drag_drop: # For paragraphs widget UI
+      itinerary_day:
+        enabled: true
+        weight: 0 # Adjust weight relative to other paragraph types if any
+field_type: entity_reference_revisions

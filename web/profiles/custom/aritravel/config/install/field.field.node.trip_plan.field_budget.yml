@@ -1,0 +1,23 @@
+uuid: tripplan-budget-field-uuid-6006
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_budget
+    - node.type.trip_plan
+id: node.trip_plan.field_budget
+field_name: field_budget
+entity_type: node
+bundle: trip_plan
+label: Budget
+description: 'Estimated budget for the trip.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: '$' # Or other currency symbol
+  suffix: ''
+field_type: decimal

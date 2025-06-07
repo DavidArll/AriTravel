@@ -1,0 +1,108 @@
+uuid: tripplan-form-display-uuid-6019
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.trip_plan.body
+    - field.field.node.trip_plan.field_budget
+    - field.field.node.trip_plan.field_cities_visited
+    - field.field.node.trip_plan.field_country
+    - field.field.node.trip_plan.field_duration
+    - field.field.node.trip_plan.field_gallery
+    - field.field.node.trip_plan.field_itinerary
+    - field.field.node.trip_plan.field_tags
+    - field.field.node.trip_plan.field_travel_style
+    - node.type.trip_plan
+  module:
+    - entity_reference_revisions # For paragraphs widget
+    - media_library
+    - path
+    - text
+id: node.trip_plan.default
+targetEntityType: node
+bundle: trip_plan
+mode: default
+content:
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings: { size: 60, placeholder: '' }
+    third_party_settings: {  }
+  body:
+    type: text_textarea_with_summary
+    weight: 1
+    region: content
+    settings: { rows: 9, summary_rows: 3, placeholder: '' }
+    third_party_settings: {  }
+  field_duration:
+    type: number
+    weight: 2
+    region: content
+    settings: { placeholder: '' }
+    third_party_settings: {  }
+  field_budget:
+    type: number # For decimal
+    weight: 3
+    region: content
+    settings: { placeholder: '' }
+    third_party_settings: {  }
+  field_travel_style:
+    type: entity_reference_autocomplete
+    weight: 4
+    region: content
+    settings: { match_operator: CONTAINS, size: 60, placeholder: '' }
+    third_party_settings: {  }
+  field_country:
+    type: entity_reference_autocomplete
+    weight: 5
+    region: content
+    settings: { match_operator: CONTAINS, size: 60, placeholder: '' }
+    third_party_settings: {  }
+  field_cities_visited:
+    type: string_textfield # Default widget for multiple strings
+    weight: 6
+    region: content
+    settings: { size: 60, placeholder: '' }
+    third_party_settings: {  }
+  field_itinerary:
+    type: entity_reference_paragraphs # Paragraphs widget
+    weight: 7
+    region: content
+    settings:
+      title: Paragraph # Widget title for a single paragraph item
+      title_plural: Paragraphs # Widget title for multiple items
+      edit_mode: open # Or 'closed', 'preview'
+      add_mode: dropdown # Or 'button'
+      form_display_mode: default # How the paragraph form itself is rendered
+      default_paragraph_type: itinerary_day
+    third_party_settings: {  }
+  field_gallery:
+    type: media_library_widget
+    weight: 8
+    region: content
+    settings: { media_types: [image] }
+    third_party_settings: {  }
+  field_tags:
+    type: entity_reference_autocomplete_tags # Allows creating new tags
+    weight: 9
+    region: content
+    settings: { match_operator: CONTAINS, size: 60, placeholder: '' }
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 11
+    region: content
+    settings: { display_label: true }
+    third_party_settings: {  }
+hidden:
+  created: true
+  promote: true
+  sticky: true
+  uid: true

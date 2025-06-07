@@ -1,0 +1,23 @@
+uuid: para-itincost-field-uuid-5009
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_itinerary_cost
+    - paragraphs.paragraphs_type.itinerary_day
+id: paragraph.itinerary_day.field_itinerary_cost
+field_name: field_itinerary_cost
+entity_type: paragraph
+bundle: itinerary_day
+label: Cost
+description: 'Estimated cost for this day/activity.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: '$'
+  suffix: ''
+field_type: decimal

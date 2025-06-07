@@ -1,0 +1,10 @@
+uuid: para-itinerary-day-type-uuid-5001
+langcode: en
+status: true
+dependencies: { }
+id: itinerary_day
+label: 'Itinerary Day'
+icon_uuid: null # Can be set to a UUID of a file if an icon is used
+icon_default: null
+description: 'A single day item for the trip itinerary.'
+behavior_plugins: { }

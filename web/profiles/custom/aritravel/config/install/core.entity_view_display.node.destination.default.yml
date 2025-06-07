@@ -1,0 +1,60 @@
+uuid: dest-view-display-uuid-1008
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.destination.field_cover_image
+    - field.field.node.destination.field_destination_country
+    - field.field.node.destination.field_related_trips
+    - field.field.node.destination.field_summary
+    - node.type.destination
+  module:
+    - text
+    - user
+id: node.destination.default
+targetEntityType: node
+bundle: destination
+mode: default
+content:
+  field_summary:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_destination_country:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_cover_image:
+    type: entity_reference_entity_view # Render the media item itself
+    label: above
+    settings:
+      view_mode: default # Or a specific media view mode like 'thumbnail'
+      link: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_related_trips:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 4
+    region: content
+links:
+  content:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  title: true # Usually title is handled by page title block
+  created: true
+  uid: true
